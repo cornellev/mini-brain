@@ -48,7 +48,7 @@ private:
 
 class JoyInterpreter : public rclcpp::Node {
     public:
-        JoyInterpreter() : Node("Joy Interpreter") {
+        JoyInterpreter() : Node("JoyInterpreter") {
             publisher_ = this->create_publisher<ackermann_msgs::msg::AckermannDrive>("ackermann", 10);
             publishertwo_ = this->create_publisher<std_msgs::msg::String>("test", 10);
             subscription_ = this->create_subscription<sensor_msgs::msg::Joy>("joy", 10, std::bind(&JoyInterpreter::topic_callback, this, std::placeholders::_1));
