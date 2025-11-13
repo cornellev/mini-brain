@@ -53,6 +53,7 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/${username}/.bashrc
 # RUN echo "source /home/${username}/ros2_ws/install/setup.bash" >> /home/${username}/.bashrc
 
 COPY --chown=rosuser:rosuser ./entrypoint.sh /home/rosuser/entrypoint.sh
+COPY --chown=rosuser:rosuser ./jetson.sh /home/rosuser/jetson.sh
 RUN chmod +x /home/rosuser/entrypoint.sh
 
 ENTRYPOINT ["/bin/bash", "/home/rosuser/entrypoint.sh"]
