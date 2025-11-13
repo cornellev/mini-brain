@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
     cmake \
+    tmux \
     && rm -rf /var/lib/apt/lists/*
 
 # install colcon and other python tools
