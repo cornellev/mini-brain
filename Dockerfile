@@ -35,7 +35,9 @@ RUN groupadd -g ${USER_GID} ${username} \
     && rm -rf /var/lib/apt/lists/*
 
 # add ackermann msgs and other packages
-RUN apt-get update && apt-get install -y ros-${ROS_DISTRO}-ackermann-msgs \
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-ackermann-msgs \
+    ros-${ROS_DISTRO}-joy \
     && rm -rf /var/lib/apt/lists/*
 
 USER ${username}

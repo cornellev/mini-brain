@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "/Users/jgrimminck/Coding/cev/workspace/src/test",
+    "cmake.sourceDirectory": "/workspaces/workspace/src/teleop",
     "files.associations": {
         "array": "cpp",
         "atomic": "cpp",
