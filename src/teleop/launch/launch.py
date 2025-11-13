@@ -7,17 +7,15 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
-    return LaunchDescription(
-        [
+    return LaunchDescription([
 	    Node(
-		package="joy",
-		executable="joy_node",
-		name="joy_node",
+            package="joy",
+            executable="joy_node",
+            name="joy_node",
 	    ),
-            Node(
-                package="teleop",
-                executable="joy_interpreter",
-                name="joy_interpreter",
-            )
-        ]
-    )
+        Node(
+            package="teleop",
+            executable="joy_interpreter",
+            name="joy_interpreter",
+        )
+    ])
