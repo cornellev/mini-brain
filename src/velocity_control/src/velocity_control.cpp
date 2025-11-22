@@ -44,7 +44,7 @@ private:
 
     void topic_callback(const ackermann_msgs::msg::AckermannDrive & msg)
     {
-        std::string txt = "Velocity: " + std::to_string(msg.speed) + "\n";
+        std::string txt = "Velocity: " + std::to_string(msg.speed);
         RCLCPP_INFO(this->get_logger(), txt.c_str());
         uint16_t speed = static_cast<uint16_t>(floorf(msg.speed));
         RCLCPP_INFO(this->get_logger(), "Speed: %d", speed);
@@ -54,7 +54,8 @@ private:
         bytes[2] = speed % (1 << 8);
         RCLCPP_INFO(this->get_logger(), "B1: %d", bytes[1]);
         RCLCPP_INFO(this->get_logger(), "B2: %d", bytes[2]);
-        int rc = serial_write(pi_, handle_, bytes, txt.size());
+        RCLCPP_INFO(this->get_logger(), "\n");
+        int rc = serial_write(pi_, handle_, bytes, 3);
         if (rc < 0) {
             RCLCPP_ERROR(get_logger(), "serial_write failed (rc=%d)", rc);
         }
