@@ -1,0 +1,28 @@
+## install pigpio:
+
+cd ~
+git clone https://github.com/joan2937/pigpio.git
+cd pigpio
+make -j4
+sudo make install prefix=/usr
+
+## cd to /lib/systemd/system and create pigpiod.service and type in the below:
+
+[Unit]
+Description=Pigpio daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/pigpiod
+ExecStop=/bin/systemctl kill pigpiod
+Type=forking
+
+[Install]
+WantedBy=multi-user.target
+
+## reload systemd
+
+sudo systemctl daemon-reload
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
+systemctl status pigpiod
