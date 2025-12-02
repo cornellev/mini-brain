@@ -8,6 +8,4 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "-- Welcome to the ROS ${ROS_DISTRO} Docker container! --"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-chmod +x /jetson.sh
-
 exec "/bin/bash"
