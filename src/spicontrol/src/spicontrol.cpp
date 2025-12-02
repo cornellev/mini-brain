@@ -10,7 +10,10 @@ class SPINode : public rclcpp::Node {
     private:
 
     void handle_ackermann_update(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg) const {
-        // do stuff
+        RCLCPP_INFO(this->get_logger(), "Received Ackermann Drive - Speed: '%f', Steering Angle: '%f'", msg->speed, msg->steering_angle);
+        double speed = msg->speed;
+        double steering_angle = msg->steering_angle;
+        
     }
 
     rclcpp::Subscription<ackermann_msgs::msg::AckermannDrive>::SharedPtr subscription_;

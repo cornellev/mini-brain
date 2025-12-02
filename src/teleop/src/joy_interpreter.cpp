@@ -50,23 +50,26 @@ class JoyInterpreter : public rclcpp::Node {
     public:
         JoyInterpreter() : Node("JoyInterpreter") {
             publisher_ = this->create_publisher<ackermann_msgs::msg::AckermannDrive>("ackermann", 10);
-            publishertwo_ = this->create_publisher<std_msgs::msg::String>("test", 10);
             subscription_ = this->create_subscription<sensor_msgs::msg::Joy>("joy", 10, std::bind(&JoyInterpreter::topic_callback, this, std::placeholders::_1));
         }
 
     private:
     
     rclcpp::Publisher<ackermann_msgs::msg::AckermannDrive>::SharedPtr publisher_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publishertwo_;
     rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
 
         void topic_callback(const sensor_msgs::msg::Joy::SharedPtr msg) const
         {
             RCLCPP_INFO(this->get_logger(), "Recieved!");
-            auto message = std_msgs::msg::String();
-            message.data = "Testing";
-            publishertwo_->publish(message);
-            //publisher_->publish();
+            
+            double left_stick_vertical = msg->axes[1];
+            double right_stick_horizontal = msg->axes[3];
+            
+            auto drive_msg = ackermann_msgs::msg::AckermannDrive();
+            drive_msg.speed = left_stick_vertical * 2.0; // scaled between -2.0 and 2.0 m/s
+            drive_msg.steering_angle = right_stick_horizontal * 0.5; // scaled between -0.5 and 0.5 radians
+
+            publisher_->publish(drive_msg);
         }
 };
 
