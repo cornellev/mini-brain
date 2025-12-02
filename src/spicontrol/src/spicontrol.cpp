@@ -26,40 +26,40 @@ class SPINode : public rclcpp::Node {
         double speed = msg->speed;
         double steering_angle = msg->steering_angle;
         // covnvert speed and steering angle to SPI data
-         std::vector<uint8_t> tx_data;
-        tx_data.reserve(1 + sizeof(speed) + sizeof(steering_angle) + 1);
+        //  std::vector<uint8_t> tx_data;
+        // tx_data.reserve(1 + sizeof(speed) + sizeof(steering_angle) + 1);
 
-        // Start byte (helps the receiver align to frames)
-        tx_data.push_back(0xAA);
+        // // Start byte (helps the receiver align to frames)
+        // tx_data.push_back(0xAA);
 
-        auto append_double = [&tx_data](double value) {
-            const uint8_t* p = reinterpret_cast<const uint8_t*>(&value);
-            tx_data.insert(tx_data.end(), p, p + sizeof(value));
-        };
+        // auto append_double = [&tx_data](double value) {
+        //     const uint8_t* p = reinterpret_cast<const uint8_t*>(&value);
+        //     tx_data.insert(tx_data.end(), p, p + sizeof(value));
+        // };
 
-        append_double(speed);
-        append_double(steering_angle);
+        // append_double(speed);
+        // append_double(steering_angle);
 
-        // Simple XOR checksum over everything after the start byte
-        uint8_t checksum = 0;
-        for (std::size_t i = 1; i < tx_data.size(); ++i) {
-            checksum ^= tx_data[i];
-        }
-        tx_data.push_back(checksum);
+        // // Simple XOR checksum over everything after the start byte
+        // uint8_t checksum = 0;
+        // for (std::size_t i = 1; i < tx_data.size(); ++i) {
+        //     checksum ^= tx_data[i];
+        // }
+        // tx_data.push_back(checksum);
 
-        // --- Actually send over SPI ---
-        try {
-            spi.write(tx_data);
-        } catch (const std::exception& e) {
-            RCLCPP_ERROR(this->get_logger(), "SPI write failed: %s", e.what());
-        }
+        // // --- Actually send over SPI ---
+        // try {
+        //     spi.write(tx_data);
+        // } catch (const std::exception& e) {
+        //     RCLCPP_ERROR(this->get_logger(), "SPI write failed: %s", e.what());
+        // }
     }
 
     rclcpp::Subscription<ackermann_msgs::msg::AckermannDrive>::SharedPtr subscription_;
 };
 
 int main(int argc, char * argv[]) {
-    std::cout << "Initialized spi device!\n"
+    std::cout << "Initialized spi device!\n";
 
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<SPINode>());
