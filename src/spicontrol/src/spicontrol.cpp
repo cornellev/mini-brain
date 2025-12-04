@@ -28,6 +28,7 @@ class SPINode : public rclcpp::Node {
         // covnvert speed and steering angle to SPI data
         std::vector<uint8_t> tx_data;
         tx_data.reserve(1 + sizeof(speed) + sizeof(steering_angle) + 1);
+        // total size: 1 + 8 + 8 + 1 = 18 bytes
 
         // Start byte (helps the receiver align to frames)
         tx_data.push_back(0xAA);

@@ -47,41 +47,68 @@ int main()
     // [10...17] = steering data (double, 8 bytes)
     // 18 => XOR checksum of bytes [0..17]
 
-    while (true) {
-        // get data from spi
-        uint8_t rx_data[19] = {0};
+    // first we'll wait till we see a 0xAA byte
+    printf("Waiting for data...\n");
+    bool data_received = false;
+    while (!data_received) {
+        uint8_t rx_byte = 0;
         gpio_put(PIN_CS, 0); // Assert CS
-        spi_read_blocking(SPI_PORT, 0x00, rx_data, 19);
+        spi_read_blocking(SPI_PORT, 0x00, &rx_byte, 1);
+        gpio_put(PIN_CS, 1); // Deassert CS
+        if (rx_byte == 0xAA) {
+            data_received = true;
+        }
+    }
+
+    printf("Data received, entering main loop...\n");
+    
+    gpio_put(PIN_CS, 0);
+    spi_read_blocking(SPI_PORT, 0x00, NULL, 18); // read and discard the rest of the first packet
+    gpio_put(PIN_CS, 1);
+
+    while (true) {
+        // do a wait for start byte again
+        data_received = false;
+        while (!data_received) {
+            uint8_t rx_byte = 0;
+            gpio_put(PIN_CS, 0); // Assert CS
+            spi_read_blocking(SPI_PORT, 0x00, &rx_byte, 1);
+            gpio_put(PIN_CS, 1); // Deassert CS
+            if (rx_byte == 0xAA) {
+                data_received = true;
+            }
+        }
+
+        // get data from spi
+        uint8_t rx_data[17] = {0};
+        gpio_put(PIN_CS, 0); // Assert CS
+        spi_read_blocking(SPI_PORT, 0x00, rx_data, 18);
         gpio_put(PIN_CS, 1); // Deassert CS
         
         double speed = 0.0;
         double steering = 0.0;
-        // parse data
-        if (rx_data[0] == 0xAA) {
-            // calculate checksum
-            uint8_t checksum = 0;
-            for (int i = 0; i < 18; i++) {
-                checksum ^= rx_data[i];
-            }
-            if (checksum == rx_data[18]) {
-                // valid data, extract speed and steering
-                memcpy(&speed, &rx_data[1], sizeof(double));
-                memcpy(&steering, &rx_data[9], sizeof(double));
-                
-                // print received values
-                printf("Speed: %f, Steering: %f\n", speed, steering);
-                // set LED brightness based on speed, speed is between -2.0 and 2.0
-                double normalized_speed = (speed + 2.0) / 4.0;
-                if (normalized_speed < 0.0) normalized_speed = 0.0;
-                if (normalized_speed > 1.0) normalized_speed = 1.0;
-                uint16_t duty_cycle = (uint16_t)(normalized_speed * 65535);
-                pwm_set_gpio_level(LED_PIN, duty_cycle);
-            } else {
-                printf("Checksum error!\n");
-            }
+
+        // calculate checksum
+        uint8_t checksum = 0;
+        for (int i = 0; i < 18; i++) {
+            checksum ^= rx_data[i];
+        }
+
+        if (checksum == rx_data[16]) { // make sure checksum matches
+            // valid data, extract speed and steering
+            memcpy(&speed, &rx_data[0], sizeof(double));
+            memcpy(&steering, &rx_data[8], sizeof(double));
+            
+            // print received values
+            printf("Speed: %f, Steering: %f\n", speed, steering);
+            // set LED brightness based on speed, speed is between -2.0 and 2.0
+            double normalized_speed = (speed + 2.0) / 4.0;
+            if (normalized_speed < 0.0) normalized_speed = 0.0;
+            if (normalized_speed > 1.0) normalized_speed = 1.0;
+            uint16_t duty_cycle = (uint16_t)(normalized_speed * 65535);
+            pwm_set_gpio_level(LED_PIN, duty_cycle);
         } else {
-            printf("Invalid start byte!\n");
-            pwm_set_gpio_level(LED_PIN, 65535 / 2); // Set LED to half brightness to indicate error
+            //printf("Checksum error!\n");
         }
     }
 }
