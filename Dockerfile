@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 USER ${username}
-WORKDIR /home/${username}/ros2_ws
+WORKDIR /home/${username}
 RUN mkdir -p src
 COPY --chown=rosuser:rosuser ./src ./src
 
