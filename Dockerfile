@@ -58,6 +58,9 @@ COPY --chown=rosuser:rosuser ./jetson.sh /home/rosuser/jetson.sh
 RUN chmod +x /home/rosuser/entrypoint.sh
 RUN chmod +x /home/rosuser/jetson.sh
 
+COPY --chown=rosuser:rosuser ./entry.sh /home/rosuser/ros2_ws/entry.sh
+RUN chmod +x /home/rosuser/ros2_ws/entry.sh
+
 ENTRYPOINT ["/bin/bash", "/home/rosuser/entrypoint.sh"]
 
 CMD ["bash"]
