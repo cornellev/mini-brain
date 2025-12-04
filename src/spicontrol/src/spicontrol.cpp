@@ -50,14 +50,13 @@ class SPINode : public rclcpp::Node {
 
         RCLCPP_INFO(this->get_logger(), "SPI write successful, sent %zu bytes", tx_data.size());
         RCLCPP_INFO(this->get_logger(), "Data bytes:");
-        for (size_t i = 0; i < tx_data.size(); ++i)
+        for (size_t i = 0; i < tx_data.size(); ++i) {
             RCLCPP_INFO(this->get_logger(), "Byte %zu: 0x%02X", i, tx_data[i]);
         }
 
         // --- Actually send over SPI ---
         try {
             spi.write(tx_data);
-            //RCLCPP_INFO(this->get_logger(), "------");
         } catch (const std::exception& e) {
             RCLCPP_ERROR(this->get_logger(), "SPI write failed: %s", e.what());
         }
