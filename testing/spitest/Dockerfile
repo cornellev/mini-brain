@@ -7,9 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /root
 
 # Get and build the kernel's spidev_test utility
-RUN wget https://raw.githubusercontent.com/torvalds/linux/master/tools/spi/spidev_test.c \
- && printf '\n#ifndef SPI_RX_CPHA_FLIP\n#define SPI_RX_CPHA_FLIP 0\n#endif\n#ifndef SPI_MOSI_IDLE_LOW\n#define SPI_MOSI_IDLE_LOW 0\n#endif\n' >> spidev_test.c \
- && gcc -o spidev_test spidev_test.c
+RUN wget https://raw.githubusercontent.com/torvalds/linux/v5.15/tools/spi/spidev_test.c \
+    && gcc -o spidev_test spidev_test.c
 
 
 CMD ["bash"]
