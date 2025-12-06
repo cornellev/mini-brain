@@ -29,16 +29,25 @@ int main()
 
     pwm_set_gpio_level(LED_PIN, 65534); // to full to indicate waiting for data
 
-    // SPI initialisation. This example will use SPI at 1MHz.
-    spi_init(SPI_PORT, 1000*1000);
+    // 500 kHz
+    spi_init(SPI_PORT, 500 * 1000);
+    spi_set_slave(SPI_PORT, true);
+
+    // Configure all SPI pins as SPI functions (including CS!)
     gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
-    gpio_set_function(PIN_CS,   GPIO_FUNC_SIO);
+    gpio_set_function(PIN_CS,   GPIO_FUNC_SPI);
     gpio_set_function(PIN_SCK,  GPIO_FUNC_SPI);
     gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
+
+    // Match Jetson: 8 bits, mode 0. If weird, try CPOL_1/CPHA_1 (mode 3).
+    spi_set_format(SPI_PORT,
+        8,
+        SPI_CPOL_0,
+        SPI_CPHA_0,
+        SPI_MSB_FIRST
+    );
+
     
-    // Chip select is active-low, so we'll initialise it to a driven-high state
-    gpio_set_dir(PIN_CS, GPIO_OUT);
-    gpio_put(PIN_CS, 1);
     // For more examples of SPI use see https://github.com/raspberrypi/pico-examples/tree/master/spi
 
     // spi input is in the format of:
@@ -46,6 +55,19 @@ int main()
     // [1..9] = speed data (double, 8 bytes)
     // [10...17] = steering data (double, 8 bytes)
     // 18 => XOR checksum of bytes [0..17]
+
+    while (true) {
+        // print out each byte
+        gpio_put(PIN_CS, 0); // Assert CS
+        uint8_t test_data[18] = {0};
+        spi_read_blocking(SPI_PORT, 0x00, test_data, 18);
+        gpio_put(PIN_CS, 1); // Deassert CS
+        printf("Received bytes: ");
+        for (int i = 0; i < 18; i++) {
+            printf("0x%02X ", test_data[i]);
+        }
+        printf("\n");
+    }
 
     // first we'll wait till we see a 0xAA byte
     printf("Waiting for data...\n");
@@ -90,7 +112,7 @@ int main()
 
         // calculate checksum
         uint8_t checksum = 0;
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < 16; i++) {
             checksum ^= rx_data[i];
         }
 
