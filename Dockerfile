@@ -61,6 +61,8 @@ RUN chmod +x /home/rosuser/jetson.sh
 COPY --chown=rosuser:rosuser ./entry.sh /home/rosuser/ros2_ws/entry.sh
 RUN chmod +x /home/rosuser/ros2_ws/entry.sh
 
+RUN chmod 666 /dev/spi*
+
 ENTRYPOINT ["/bin/bash", "/home/rosuser/entrypoint.sh"]
 
 CMD ["bash"]

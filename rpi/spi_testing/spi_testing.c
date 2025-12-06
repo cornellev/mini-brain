@@ -62,7 +62,11 @@ int main()
 
     printf("Data received, entering main loop...\n");
     
-    spi_read_blocking(SPI_PORT, 0x00, NULL, 18); // read and discard the rest of the first packet
+    // stupid ahh spi read byte by byte because pico sdk spi_read_blocking is broken
+    for (int i = 0; i < 17; i++) {
+        uint8_t byte = 0;
+        spi_read_blocking(SPI_PORT, 0x00, NULL, 1);
+    }
 
     while (true) {
         // do a wait for start byte again
@@ -77,7 +81,15 @@ int main()
 
         // get data from spi
         uint8_t rx_data[17] = {0};
-        spi_read_blocking(SPI_PORT, 0x00, rx_data, 18);
+
+        // stupid ahh spi read byte by byte because pico sdk spi_read_blocking is broken
+        for (int i = 0; i < 17; i++) {
+            uint8_t byte = 0;
+            spi_read_blocking(SPI_PORT, 0x00, &byte, 1);
+            printf("Read byte %d: %02X\n", i, byte);
+            rx_data[i] = byte;
+        }
+        
         
         double speed = 0.0;
         double steering = 0.0;
@@ -87,6 +99,8 @@ int main()
         for (int i = 0; i < 16; i++) {
             checksum ^= rx_data[i];
         }
+
+        printf("Received checksum: %02X, Calculated checksum: %02X\n", rx_data[16], checksum);
 
         if (checksum == rx_data[16]) { // make sure checksum matches
             // valid data, extract speed and steering

@@ -56,7 +56,10 @@ class SPINode : public rclcpp::Node {
 
         // --- Actually send over SPI ---
         try {
-            spi.write(tx_data);
+            for (size_t i = 0; i < tx_data.size(); ++i) {
+                std::vector<uint8_t> byte_to_send = {tx_data[i]};
+                spi.write(byte_to_send);
+            }
         } catch (const std::exception& e) {
             RCLCPP_ERROR(this->get_logger(), "SPI write failed: %s", e.what());
         }
