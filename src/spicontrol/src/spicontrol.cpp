@@ -8,7 +8,7 @@
 // include spicomms.cpp
 #include "spicomms.cpp"
 
-const std::string dev = "/dev/spidev0.0";
+const std::string dev = "/dev/spidev0.1";
 uint32_t speedHz = 1'000'000;  // 1 MHz
 
 SpiDevice spi(dev, speedHz, SPI_MODE_0, 8);
