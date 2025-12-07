@@ -60,7 +60,7 @@ class JoyInterpreter : public rclcpp::Node {
 
         void topic_callback(const sensor_msgs::msg::Joy::SharedPtr msg) const
         {
-            RCLCPP_INFO(this->get_logger(), "Recieved!");
+            //RCLCPP_INFO(this->get_logger(), "Recieved!");
             
             double left_stick_vertical = msg->axes[1];
             double right_stick_horizontal = msg->axes[3];

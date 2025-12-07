@@ -22,7 +22,7 @@ class SPINode : public rclcpp::Node {
     private:
 
     void handle_ackermann_update(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg) const {
-        RCLCPP_INFO(this->get_logger(), "Received Ackermann Drive - Speed: '%f', Steering Angle: '%f'", msg->speed, msg->steering_angle);
+        //RCLCPP_INFO(this->get_logger(), "Received Ackermann Drive - Speed: '%f', Steering Angle: '%f'", msg->speed, msg->steering_angle);
         double speed = msg->speed;
         double steering_angle = msg->steering_angle;
         // covnvert speed and steering angle to SPI data
@@ -48,11 +48,11 @@ class SPINode : public rclcpp::Node {
         }
         tx_data.push_back(checksum);
 
-        RCLCPP_INFO(this->get_logger(), "SPI write successful, sent %zu bytes", tx_data.size());
-        RCLCPP_INFO(this->get_logger(), "Data bytes:");
-        for (size_t i = 0; i < tx_data.size(); ++i) {
-            RCLCPP_INFO(this->get_logger(), "Byte %zu: 0x%02X", i, tx_data[i]);
-        }
+        // RCLCPP_INFO(this->get_logger(), "SPI write successful, sent %zu bytes", tx_data.size());
+        // RCLCPP_INFO(this->get_logger(), "Data bytes:");
+        // for (size_t i = 0; i < tx_data.size(); ++i) {
+        //     RCLCPP_INFO(this->get_logger(), "Byte %zu: 0x%02X", i, tx_data[i]);
+        // }
 
         // --- Actually send over SPI ---
         try {
