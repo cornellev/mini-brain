@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(spi_testing spi_testing.c )
+add_executable(spi_testing spi_testing.c motors/brushless.c motors/stepper.c)
 
 pico_set_program_name(spi_testing "spi_testing")
 pico_set_program_version(spi_testing "0.1")

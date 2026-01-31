@@ -4,6 +4,8 @@
 #include "hardware/spi.h"
 #include "hardware/pwm.h"
 #include <math.h>
+#include "motors/brushless.h"
+#include "motors/stepper.h"
 
 // SPI Defines
 // We are going to use SPI 0, and allocate it to the following GPIO pins
@@ -11,6 +13,11 @@
 #define SPI_PORT spi0
 
 #define LED_PIN 25
+
+#define LB_PWM 16 // FIX
+#define LB_DIR 17 // FIX
+#define RB_PWM 18 // FIX
+#define RB_DIR 19 // FIX
 
 int main()
 {
@@ -26,6 +33,10 @@ int main()
     pwm_set_enabled(slice_num, true);
 
     pwm_set_gpio_level(LED_PIN, 65534); // to full to indicate waiting for data
+
+    setup_pwm(LB_PWM, LB_DIR);
+    setup_pwm(RB_PWM, RB_DIR);
+    setup_stepper();
 
     // SPI init – 500 kHz, slave mode
     spi_init(SPI_PORT, 1 * 1000 * 1000);
@@ -106,15 +117,21 @@ int main()
             // valid data, extract speed and steering
             memcpy(&speed, &rx_data[0], sizeof(double));
             memcpy(&steering, &rx_data[8], sizeof(double));
+
+            // correctly scale
+            if (speed > 1) {
+                speed = 1;
+            } else if (speed < 1) {
+                speed = -1;
+            }
             
-            // print received values
-            printf("Speed: %f, Steering: %f\n", speed, steering);
-            // set LED brightness based on speed, speed is between -2.0 and 2.0
-            double normalized_speed = (speed + 2.0) / 4.0;
-            if (normalized_speed < 0.0) normalized_speed = 0.0;
-            if (normalized_speed > 1.0) normalized_speed = 1.0;
-            uint16_t duty_cycle = (uint16_t)(normalized_speed * 65535);
-            pwm_set_gpio_level(LED_PIN, duty_cycle);
+            // assume that speed is between -1 and 1
+            bool forward = speed > 0;
+            uint32_t sp = (int) ((speed < 0 ? -speed : speed) * 65535u);
+            set_brushless_pwm(LB_PWM, LB_DIR, sp, forward);
+            set_brushless_pwm(RB_PWM, RB_DIR, sp, !forward);
+
+            // do steering
         } else {
             //printf("Checksum error!\n");
         }
